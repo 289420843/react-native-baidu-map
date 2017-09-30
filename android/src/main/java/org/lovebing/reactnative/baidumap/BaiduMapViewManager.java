@@ -55,6 +55,8 @@ public class BaiduMapViewManager extends ViewGroupManager<MapView> {
     }
 
     public MapView createViewInstance(ThemedReactContext context) {
+        mMarkerMap = new HashMap<>();
+        mMarkersMap = new HashMap<>();
         mReactContext = context;
         MapView mapView =  new MapView(context);
         setListeners(mapView);
@@ -120,11 +122,12 @@ public class BaiduMapViewManager extends ViewGroupManager<MapView> {
     }
 
     @ReactProp(name="marker")
-    public void setMarker(MapView mapView, ReadableMap option) {
+    public void setMarker(MapView mapView, ReadableMap option) throws Exception {
         if(option != null) {
             String key = "marker_" + mapView.getId();
             Marker marker = mMarkerMap.get(key);
             if(marker != null) {
+
                 MarkerUtil.updateMaker(marker, option);
             }
             else {
@@ -135,7 +138,7 @@ public class BaiduMapViewManager extends ViewGroupManager<MapView> {
     }
 
     @ReactProp(name="markers")
-    public void setMarkers(MapView mapView, ReadableArray options) {
+    public void setMarkers(MapView mapView, ReadableArray options) throws Exception {
         String key = "markers_" + mapView.getId();
         List<Marker> markers = mMarkersMap.get(key);
         if(markers == null) {

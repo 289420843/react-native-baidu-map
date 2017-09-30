@@ -23,6 +23,8 @@ import {
 } from 'react-native';
 
 import Dimensions from 'Dimensions';
+const ds = require("./images/doctor.png");
+const hs = require("./images/hospital.png");
 
 export default class BaiduMapDemo extends Component {
 
@@ -41,11 +43,13 @@ export default class BaiduMapDemo extends Component {
       markers: [{
         longitude: 113.981718,
         latitude: 22.542449,
-        title: "Window of the world"
+        title: "Window of the world",
+        image:ds,
       },{
         longitude: 113.995516,
         latitude: 22.537642,
-        title: ""
+        title: "",
+        image:hs,
       }]
     };
   }

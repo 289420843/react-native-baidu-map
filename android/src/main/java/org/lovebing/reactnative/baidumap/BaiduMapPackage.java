@@ -20,7 +20,7 @@ import com.facebook.react.uimanager.ViewManager;
  */
 public class BaiduMapPackage implements ReactPackage {
 
-    private Context mContext;
+    public static Context mContext;
 
     BaiduMapViewManager baiduMapViewManager;
 
