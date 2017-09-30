@@ -58,6 +58,7 @@ export default class BaiduMapDemo extends Component {
   }
 
   render() {
+    console.warn("@cc ss");
     return (
       <View style={styles.container}>
         <MapView 
@@ -69,6 +70,18 @@ export default class BaiduMapDemo extends Component {
           marker={this.state.marker}
           markers={this.state.markers}
           style={styles.map}
+          onMapStatusChangeEnd={(e)=>{
+            console.warn("onMapStatusChangeEnd",e)
+          }}
+          onMapStatusChange={(e)=>{
+            console.warn("onMapStatusChange",e)
+          }}
+          onMapStatusChangeStart={(e)=>{
+            console.warn("onMapStatusChangeStart",e)
+          }}
+          onMapStatusChangeFinish={(e)=>{
+            console.warn("onMapStatusChangeFinish",e)
+          }}
           onMarkerClick={(e) => {
             console.warn(JSON.stringify(e));
           }}
