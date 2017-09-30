@@ -43,7 +43,9 @@ public class BaiduMapViewManager extends ViewGroupManager<MapView> {
     private ReadableArray childrenPoints;
     private HashMap<String, Marker> mMarkerMap = new HashMap<>();
     private HashMap<String, List<Marker>> mMarkersMap = new HashMap<>();
+    private ReactMapView mMapView;
     private TextView mMarkerText;
+    private boolean isMapLoaded;
 
     public String getName() {
         return REACT_CLASS;
@@ -59,7 +61,9 @@ public class BaiduMapViewManager extends ViewGroupManager<MapView> {
         mMarkersMap = new HashMap<>();
         mReactContext = context;
         MapView mapView =  new MapView(context);
+        mMapView = new ReactMapView(mapView);
         setListeners(mapView);
+
         return mapView;
     }
 
@@ -81,7 +85,7 @@ public class BaiduMapViewManager extends ViewGroupManager<MapView> {
 
     }
 
-    @ReactProp(name = "zoomControlsVisible")
+    @ReactProp(name = "zoomControlsVisible", defaultBoolean = false)
     public void setZoomControlsVisible(MapView mapView, boolean zoomControlsVisible) {
         mapView.showZoomControls(zoomControlsVisible);
     }
@@ -89,6 +93,25 @@ public class BaiduMapViewManager extends ViewGroupManager<MapView> {
     @ReactProp(name="trafficEnabled")
     public void setTrafficEnabled(MapView mapView, boolean trafficEnabled) {
         mapView.getMap().setTrafficEnabled(trafficEnabled);
+    }
+    @ReactProp(name = "showsCompass", defaultBoolean = false)
+    public void setShowsCompass(MapView mapView, Boolean show) {
+        mapView.getMap().getUiSettings().setCompassEnabled(show);
+    }
+
+    @ReactProp(name = "showsUserLocation", defaultBoolean = false)
+    public void setShowsUserLocation(MapView mapView, Boolean show) {
+        mMapView.setShowsUserLocation(show);
+    }
+    @ReactProp(name = "userLocationViewParams")
+    public void setUserLocationViewParams(MapView mapView, @Nullable ReadableMap params) {
+        ReactMapMyLocationConfiguration configuration = new ReactMapMyLocationConfiguration(mReactContext);
+        configuration.buildConfiguration(params);
+        this.mMapView.setConfiguration(configuration);
+    }
+    @ReactProp(name = "zoomEnabled", defaultBoolean = true)
+    public void setZoomEnabled(MapView mapView, Boolean enable) {
+        mapView.getMap().getUiSettings().setZoomGesturesEnabled(enable);
     }
 
     @ReactProp(name="baiduHeatMapEnabled")
@@ -122,46 +145,46 @@ public class BaiduMapViewManager extends ViewGroupManager<MapView> {
     }
 
     @ReactProp(name="marker")
-    public void setMarker(MapView mapView, ReadableMap option) throws Exception {
-        if(option != null) {
-            String key = "marker_" + mapView.getId();
-            Marker marker = mMarkerMap.get(key);
-            if(marker != null) {
+    public void setMarker(MapView mapView, ReadableMap annotation) throws Exception {
+        if (annotation == null ) {
+            Log.e(REACT_CLASS, "Error: no annotation");
+            return;
+        }
 
-                MarkerUtil.updateMaker(marker, option);
-            }
-            else {
-                marker = MarkerUtil.addMarker(mapView, option);
-                mMarkerMap.put(key, marker);
-            }
+        List<ReactMapMarker> markers = new ArrayList<ReactMapMarker>();
+
+            ReactMapMarker marker = new ReactMapMarker(this.mReactContext);
+            marker.buildMarker(annotation);
+            markers.add(marker);
+
+        mMapView.setMarker(markers);
+
+        if (this.isMapLoaded && this.mMapView.isAutoZoomToSpan()) {
+            this.mMapView.zoomToSpan();
         }
     }
 
     @ReactProp(name="markers")
     public void setMarkers(MapView mapView, ReadableArray options) throws Exception {
-        String key = "markers_" + mapView.getId();
-        List<Marker> markers = mMarkersMap.get(key);
-        if(markers == null) {
-            markers = new ArrayList<>();
+        if (options == null || options.size() == 0) {
+            Log.e(REACT_CLASS, "Error: no annotation");
+            return;
         }
-        for (int i = 0; i < options.size(); i++) {
-            ReadableMap option = options.getMap(i);
-            if(markers.size() > i + 1 && markers.get(i) != null) {
-                MarkerUtil.updateMaker(markers.get(i), option);
-            }
-            else {
-                markers.add(i, MarkerUtil.addMarker(mapView, option));
-            }
+
+        List<ReactMapMarker> markers = new ArrayList<ReactMapMarker>();
+        int size = options.size();
+        for (int i = 0; i < size; i++) {
+            ReadableMap annotation = options.getMap(i);
+            ReactMapMarker marker = new ReactMapMarker(this.mReactContext);
+            marker.buildMarker(annotation);
+            markers.add(marker);
         }
-        if(options.size() < markers.size()) {
-            int start = markers.size() - 1;
-            int end = options.size();
-            for (int i = start; i >= end; i--) {
-                markers.get(i).remove();
-                markers.remove(i);
-            }
+
+        mMapView.setMarker(markers);
+
+        if (this.isMapLoaded && this.mMapView.isAutoZoomToSpan()) {
+            this.mMapView.zoomToSpan();
         }
-        mMarkersMap.put(key, markers);
     }
 
     @ReactProp(name = "childrenPoints")
@@ -181,6 +204,13 @@ public class BaiduMapViewManager extends ViewGroupManager<MapView> {
             mMarkerText.setBackgroundResource(R.drawable.popup);
             mMarkerText.setPadding(32, 32, 32, 32);
         }
+        map.setOnMapLoadedCallback(new BaiduMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                BaiduMapViewManager.this.isMapLoaded = true;
+                mMapView.onMapLoaded();
+            }
+        });
         map.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
 
             private WritableMap getEventParams(MapStatus mapStatus) {
