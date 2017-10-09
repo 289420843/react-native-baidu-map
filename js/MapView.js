@@ -7,8 +7,8 @@ import {
 } from 'react-native';
 import React, {
     Component,
-    PropTypes
 } from 'react';
+import PropTypes from "prop-types"
 
 import MapTypes from './MapTypes';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
