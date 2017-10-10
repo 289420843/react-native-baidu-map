@@ -7,8 +7,7 @@ import {
 } from 'react-native';
 
 import React, {
-  Component,
-  PropTypes
+  Component
 } from 'react';
 
 import _MapTypes from './js/MapTypes';
