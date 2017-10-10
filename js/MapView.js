@@ -7,8 +7,8 @@ import {
 } from 'react-native';
 import React, {
     Component,
-    PropTypes
 } from 'react';
+import PropTypes from "prop-types"
 
 import MapTypes from './MapTypes';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
@@ -63,15 +63,17 @@ export default class MapView extends Component {
 
     render() {
         let {markers, marker} =this.props;
-        if(marker && marker.image){
-            marker.image = resolveAssetSource(marker.image);
+        let markers_ = JSON.deepcopy(markers);
+        let marker_ = JSON.deepcopy(marker);
+        if(marker_ && marker_.image){
+            marker_.image = resolveAssetSource(marker_.image);
         }
-        markers.map(item=>{
+        markers_.map(item=>{
             if(item.image){
                 item.image = resolveAssetSource(item.image);
             }
         });
-        return <BaiduMapView {...this.props} marker={marker} markers={markers} onChange={this._onChange.bind(this)}/>;
+        return <BaiduMapView {...this.props} marker={marker_} markers={markers_} onChange={this._onChange.bind(this)}/>;
     }
 }
 

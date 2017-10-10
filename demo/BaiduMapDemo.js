@@ -44,12 +44,12 @@ export default class BaiduMapDemo extends Component {
         longitude: 113.981718,
         latitude: 22.542449,
         title: "Window of the world",
-          image: {uri: "http://www.easyicon.net/api/resizeApi.php?id=1184187&size=128"},
+          // image: {uri: "http://www.easyicon.net/api/resizeApi.php?id=1184187&size=128"},
       },{
         longitude: 113.995516,
         latitude: 22.537642,
         title: "",
-          image: {uri: "http://www.easyicon.net/api/resizeApi.php?id=1184187&size=128"},
+          // image: {uri: "http://www.easyicon.net/api/resizeApi.php?id=1184187&size=128"},
       }]
     };
   }
